@@ -1,0 +1,704 @@
+<!DOCTYPE html><html lang="en"><head><meta name="generator" content="Hexo 3.8.0"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"><meta name="author" content="Janny Zhou"><meta name="renderer" content="webkit"><meta name="copyright" content="Janny Zhou"><meta name="keywords" content="Janny Zhou's blog"><meta name="description" content="null"><meta name="Cache-Control" content="no-cache"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Coding Demonstration · Janny Zhou's Blog</title><link rel="stylesheet" href="/css/style.css?v=2018.7.9"><link rel="stylesheet" href="/css/animation.css?v=2018.7.9"><link rel="icon" href="/img/assets/favicon.ico"><link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css?version=1.5.6"><!-- scripts--><script>(function( w ){
+  "use strict";
+  // rel=preload support test
+  if( !w.loadCSS ){
+    w.loadCSS = function(){};
+  }
+  // define on the loadCSS obj
+  var rp = loadCSS.relpreload = {};
+  // rel=preload feature support test
+  // runs once and returns a function for compat purposes
+  rp.support = (function(){
+    var ret;
+    try {
+      ret = w.document.createElement( "link" ).relList.supports( "preload" );
+    } catch (e) {
+      ret = false;
+    }
+    return function(){
+      return ret;
+    };
+  })();
+
+  // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+  // then change that media back to its intended value on load
+  rp.bindMediaToggle = function( link ){
+    // remember existing media attr for ultimate state, or default to 'all'
+    var finalMedia = link.media || "all";
+
+    function enableStylesheet(){
+      link.media = finalMedia;
+    }
+
+    // bind load handlers to enable media
+    if( link.addEventListener ){
+      link.addEventListener( "load", enableStylesheet );
+    } else if( link.attachEvent ){
+      link.attachEvent( "onload", enableStylesheet );
+    }
+
+    // Set rel and non-applicable media type to start an async request
+    // note: timeout allows this to happen async to let rendering continue in IE
+    setTimeout(function(){
+      link.rel = "stylesheet";
+      link.media = "only x";
+    });
+    // also enable media after 3 seconds,
+    // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+    setTimeout( enableStylesheet, 3000 );
+  };
+
+  // loop through link elements in DOM
+  rp.poly = function(){
+    // double check this to prevent external calls from running
+    if( rp.support() ){
+      return;
+    }
+    var links = w.document.getElementsByTagName( "link" );
+    for( var i = 0; i < links.length; i++ ){
+      var link = links[ i ];
+      // qualify links to those with rel=preload and as=style attrs
+      if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+        // prevent rerunning on link
+        link.setAttribute( "data-loadcss", true );
+        // bind listeners to toggle media back
+        rp.bindMediaToggle( link );
+      }
+    }
+  };
+
+  // if unsupported, run the polyfill
+  if( !rp.support() ){
+    // run once at least
+    rp.poly();
+
+    // rerun poly on an interval until onload
+    var run = w.setInterval( rp.poly, 500 );
+    if( w.addEventListener ){
+      w.addEventListener( "load", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    } else if( w.attachEvent ){
+      w.attachEvent( "onload", function(){
+        rp.poly();
+        w.clearInterval( run );
+      } );
+    }
+  }
+
+
+  // commonjs
+  if( typeof exports !== "undefined" ){
+    exports.loadCSS = loadCSS;
+  }
+  else {
+    w.loadCSS = loadCSS;
+  }
+}( typeof global !== "undefined" ? global : this ) );</script><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" defer></script><script src="/js/main.js?v=2018.7.9" defer></script><!-- fancybox--><link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script><!-- busuanzi--><script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script></head><body><section class="profile-close" id="cxo-profile"><div class="profile-avatar"><i class="fa fa-caret-left"></i><img src="/avatar.jpg"></div><!--.profile-saying
+  i.fa.fa-comment
+  .saying--><div class="cxo-profile-inner"><div class="profile-name">Janny Zhou</div><div class="read-progress"></div></div></section><header id="cxo-intro" style="height: 70vh;background-image: url(/img/intro/index-bg.png);"><nav id="cxo-intro-nav"><section><div class="intro-nav-title"><a href="/">Janny Zhou's Blog</a></div><div class="intro-nav-label-box"><a href="/">Home</a></div><i class="fa fa-bars intro-nav-menu"><div class="intro-nav-drop"><a href="/">Home</a></div></i><div class="clear"></div></section></nav><h1 class="post-title">Coding Demonstration</h1><div class="post-intros"><div class="post-intro-meta"><span class="post-intro-time"><i class="post-intro-calendar fa fa-calendar"></i><span>2019-08-20</span></span></div></div></header><article class="cxo-up" id="cxo-content-outer"><section id="cxo-content-inner"><article class="article-entry" id="post"><pre><code class="python"><span class="comment">#!/usr/bin/env python</span>
+<span class="comment"># coding: utf-8</span>
+
+<span class="comment"># # __Lecture 4&amp;5 Demo RNA-Seq Analysis__</span>
+
+<span class="comment"># In[ ]:</span>
+
+
+get_ipython().run_line_magic(<span class="string">'matplotlib'</span>, <span class="string">'inline'</span>)
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> matplotlib.mlab <span class="keyword">as</span> mlab
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> random <span class="keyword">as</span> rd
+<span class="keyword">from</span> sklearn.cluster <span class="keyword">import</span> KMeans
+<span class="keyword">from</span> sklearn <span class="keyword">import</span> metrics
+<span class="keyword">import</span> re
+<span class="keyword">from</span> sklearn.impute <span class="keyword">import</span> SimpleImputer <span class="keyword">as</span> Imputer
+<span class="keyword">from</span> numpy <span class="keyword">import</span> random
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> seaborn <span class="keyword">as</span> sns
+<span class="keyword">from</span> sklearn <span class="keyword">import</span> preprocessing
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler
+<span class="keyword">from</span> sklearn.decomposition <span class="keyword">import</span> PCA
+
+
+<span class="comment"># In[ ]:</span>
+
+
+<span class="function"><span class="keyword">def</span> <span class="title">uniqueish_color</span><span class="params">()</span>:</span>
+    <span class="string">"""There're better ways to generate unique colors, but this isn't awful."""</span>
+    <span class="keyword">return</span> plt.cm.gist_ncar(np.random.random())
+
+colors_ = [<span class="string">'gold'</span>, <span class="string">'magenta'</span>, <span class="string">'orange'</span>, <span class="string">'green'</span>, <span class="string">'crimson'</span>, <span class="string">'grey'</span>, <span class="string">'brown'</span>]
+
+
+<span class="comment"># ## Proteomics Dataset</span>
+
+<span class="comment"># In[ ]:</span>
+
+
+<span class="comment">### Set name to each file for easier loading</span>
+dataset_path = <span class="string">"proteomes_CPTAC_itraq_77_cancer.csv"</span>
+clinical_info = <span class="string">"clinical_data_breast_cancer.csv"</span>
+pam50_proteins = <span class="string">"PAM50_proteins.csv"</span>
+BRCA_RNA_dat = <span class="string">"BRCA_RNA_Seq_Samples_Overlap_with_Proteomes_RSEM_est.csv"</span>
+
+<span class="comment">## Load data</span>
+data = pd.read_csv(dataset_path,header=<span class="number">0</span>,index_col=<span class="number">0</span>)
+clinical = pd.read_csv(clinical_info,header=<span class="number">0</span>,index_col=<span class="number">0</span>)<span class="comment">## holds clinical information about each patient/sample</span>
+pam50 = pd.read_csv(pam50_proteins,header=<span class="number">0</span>)
+
+<span class="comment">## Drop unused information columns</span>
+data.drop([<span class="string">'gene_symbol'</span>,<span class="string">'gene_name'</span>],axis=<span class="number">1</span>,inplace=<span class="literal">True</span>)
+
+<span class="comment">## Change the protein data sample names to a format matching the clinical data set</span>
+data.rename(columns=<span class="keyword">lambda</span> x: <span class="string">"TCGA-%s"</span> % (re.split(<span class="string">'[_|-|.]'</span>,x)[<span class="number">0</span>]) <span class="keyword">if</span> bool(re.search(<span class="string">"TCGA"</span>,x)) <span class="keyword">is</span> <span class="literal">True</span> <span class="keyword">else</span> x,inplace=<span class="literal">True</span>)
+
+<span class="comment">## Transpose data for the clustering algorithm since we want to divide patient samples, not proteins</span>
+data = data.transpose()
+
+<span class="comment">## Drop clinical entries for samples not in our protein data set</span>
+clinical = clinical.loc[[x <span class="keyword">for</span> x <span class="keyword">in</span> clinical.index.tolist() <span class="keyword">if</span> x <span class="keyword">in</span> data.index],:]
+
+<span class="comment">## Add clinical meta data to our protein data set, note: all numerical features for analysis start with NP_ or XP_</span>
+merged = data.merge(clinical,left_index=<span class="literal">True</span>,right_index=<span class="literal">True</span>)
+
+<span class="comment">## Change name to make it look nicer in the code!</span>
+processed = merged
+
+<span class="comment">## Numerical data for the algorithm, NP_xx/XP_xx are protein identifiers from RefSeq database</span>
+processed_numerical = processed.loc[:,[x <span class="keyword">for</span> x <span class="keyword">in</span> processed.columns <span class="keyword">if</span> bool(re.search(<span class="string">"NP_|XP_"</span>,x)) == <span class="literal">True</span>]]
+
+<span class="comment">## Select only the PAM50 proteins - known panel of genes used for breast cancer subtype prediction</span>
+processed_numerical_p50 = processed_numerical.loc[:,processed_numerical.columns.isin(pam50[<span class="string">'RefSeqProteinID'</span>])]
+<span class="comment"># processed_numerical_p50.replace([np.inf, -np.inf], np.nan)</span>
+
+<span class="comment">## Impute missing values (maybe another method would work better?)</span>
+imputer = Imputer(missing_values=np.nan, strategy=<span class="string">'mean'</span>)
+imputer = imputer.fit(processed_numerical_p50)
+processed_numerical_p50 = imputer.transform(processed_numerical_p50)
+
+
+<span class="comment"># In[58]:</span>
+
+
+data.head()
+
+
+<span class="comment"># In[59]:</span>
+
+
+clinical.head()
+
+
+<span class="comment"># In[60]:</span>
+
+
+pam50.shape
+
+
+<span class="comment"># ### PCA Plot for Proteomics Dataset by PAM50 Test</span>
+<span class="comment"># </span>
+<span class="comment"># The Prosigna Breast Cancer Prognostic Gene Signature Assay (formerly called the PAM50 test), made by NanoString, is a genomic test that analyzes the activity of certain genes in early-stage, hormone-receptor-positive breast cancer.</span>
+<span class="comment"># </span>
+<span class="comment"># Research suggests the test may eventually be widely used to help make treatment decisions based on the risk of distant recurrence (cancer coming back in a part of the body away from the breast) for postmenopausal women within 10 years of diagnosis of early-stage, hormone-receptor positive disease with up to three positive lymph nodes after 5 years of hormonal therapy treatment.</span>
+
+<span class="comment"># In[68]:</span>
+
+
+scaled_data = preprocessing.scale(processed_numerical_p50)
+
+<span class="comment"># # 2D</span>
+pca = PCA(n_components=<span class="number">2</span>) <span class="comment"># create a PCA object</span>
+pca.fit(scaled_data) <span class="comment"># do the math</span>
+pca_data = pca.transform(scaled_data) <span class="comment"># get PCA coordinates for scaled_data</span>
+per_var = np.round(pca.explained_variance_ratio_* <span class="number">100</span>, decimals=<span class="number">1</span>) <span class="comment"># get the variance explained by each component</span>
+
+<span class="comment">### Doesn't function properly</span>
+<span class="comment"># ===================================</span>
+<span class="comment"># pca = PCA(n_components=2)</span>
+<span class="comment"># principalComponents = pca.fit_transform(x)</span>
+<span class="comment"># ===================================</span>
+principalDf = pd.DataFrame(data = np.array(pca_data), index=processed[<span class="string">'PAM50 mRNA'</span>], columns = [<span class="string">'principal component 1'</span>, <span class="string">'principal component 2'</span>])
+
+<span class="comment"># # visualization</span>
+fig = plt.figure(figsize = (<span class="number">8</span>,<span class="number">8</span>))
+ax = fig.add_subplot(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>) 
+ax.set_xlabel(<span class="string">'Principal Component 1 - {0}%'</span>.format(per_var[<span class="number">0</span>]), fontsize = <span class="number">15</span>)
+ax.set_ylabel(<span class="string">'Principal Component 2 - {0}%'</span>.format(per_var[<span class="number">1</span>]), fontsize = <span class="number">15</span>)
+ax.set_title(<span class="string">'PCA for Proteomics Data - By PAM50'</span>, fontsize = <span class="number">20</span>)
+ax.yaxis.set_tick_params(labelsize=<span class="number">14</span>)
+ax.xaxis.set_tick_params(labelsize=<span class="number">14</span>)
+
+<span class="comment"># principalDf.plot.scatter(x='principal component 1', y='principal component 2', label=principalDf.index, ax=ax);</span>
+<span class="keyword">for</span> name, group <span class="keyword">in</span> principalDf.groupby(principalDf.index):
+    group.plot.scatter(x=<span class="string">'principal component 1'</span>, y=<span class="string">'principal component 2'</span>, color=np.random.choice(colors_), s=<span class="number">60</span>, label=name, ax=ax)
+ax.legend(fontsize=<span class="number">15</span>)
+ax.grid()
+
+
+<span class="comment"># ### PCA Plot for Proteomics Dataset by Proteomics Data Clustering</span>
+
+<span class="comment"># In[70]:</span>
+
+
+<span class="comment">## Visualize data using k==3, show the heatmap of protein expression for the used PAM50 proteins (43 available in our data)</span>
+<span class="comment"># fig = plt.figure(figsize = (8,8))</span>
+<span class="comment"># ax = fig.add_subplot(1,1,1) </span>
+
+fig, axes = plt.subplots(<span class="number">1</span>,<span class="number">3</span>,sharey=<span class="literal">True</span>)
+fig.set_size_inches((<span class="number">20</span>,<span class="number">7</span>))
+
+<span class="keyword">for</span> idx <span class="keyword">in</span> range(<span class="number">3</span>, <span class="number">6</span>):
+    ax = axes[idx<span class="number">-3</span>]
+    clusterer_final = KMeans(n_clusters=idx, n_jobs=<span class="number">4</span>)
+    clusterer_final = clusterer_final.fit(processed_numerical_p50)
+    <span class="comment"># processed_p50_plot['KMeans_cluster'] = clusterer_final.labels_</span>
+    <span class="comment"># processed_p50_plot.sort_values('KMeans_cluster',axis=0,inplace=True)</span>
+
+    principalDf[str(idx)+<span class="string">'_clusters_label'</span>] = clusterer_final.labels_
+    <span class="comment"># principalDf.head()</span>
+    <span class="comment"># visualization</span>
+
+    ax.yaxis.set_tick_params(labelsize=<span class="number">14</span>)
+    ax.xaxis.set_tick_params(labelsize=<span class="number">14</span>)
+
+    <span class="comment"># principalDf.plot.scatter(x='principal component 1', y='principal component 2', label=principalDf.index, ax=ax);</span>
+    <span class="keyword">for</span> name, group <span class="keyword">in</span> principalDf.groupby(principalDf[str(idx)+<span class="string">'_clusters_label'</span>]):
+        group.plot.scatter(x=<span class="string">'principal component 1'</span>, y=<span class="string">'principal component 2'</span>, color=np.random.choice(colors_), s=<span class="number">60</span>, label=<span class="string">'Cluster '</span>+str(name+<span class="number">1</span>), ax=ax)
+
+    <span class="keyword">if</span> (idx<span class="number">-3</span> == <span class="number">1</span>):
+        ax.set_xlabel(<span class="string">'Principal Component 1 - {0}%'</span>.format(per_var[<span class="number">0</span>]), fontsize = <span class="number">15</span>)
+        ax.set_title(<span class="string">'PCA for All Proteomics Data - By K-Means Clustering'</span>, fontsize = <span class="number">20</span>)
+    <span class="keyword">else</span>:
+        ax.set_xlabel(<span class="string">''</span>)
+
+    <span class="keyword">if</span> (idx<span class="number">-3</span> == <span class="number">0</span>):
+        ax.set_ylabel(<span class="string">'Principal Component 2 - {0}%'</span>.format(per_var[<span class="number">1</span>]), fontsize = <span class="number">15</span>)
+
+    ax.legend(fontsize=<span class="number">14</span>)
+    ax.grid()
+
+plt.tight_layout()
+plt.subplots_adjust(top=<span class="number">0.88</span>,wspace = <span class="number">0.03</span>,hspace=<span class="number">0.12</span>)
+
+
+<span class="comment"># ### PCA Plot for Proteomics Dataset by Proteomics Data Clustering - Random Proteins</span>
+
+<span class="comment"># In[72]:</span>
+
+
+<span class="comment">## What if we use a random set of 43 proteins? Will the clustering be as good?</span>
+<span class="comment">## Create a random numerical matrix with imputation:</span>
+processed_numerical_random = processed_numerical.iloc[:,random.choice(range(processed_numerical.shape[<span class="number">1</span>]),<span class="number">60</span>)]
+imputer_rnd = imputer.fit(processed_numerical_random)
+processed_numerical_random = imputer_rnd.transform(processed_numerical_random)
+
+fig, axes = plt.subplots(<span class="number">1</span>,<span class="number">3</span>,sharey=<span class="literal">True</span>)
+fig.set_size_inches((<span class="number">20</span>,<span class="number">7</span>))
+
+<span class="keyword">for</span> idx <span class="keyword">in</span> range(<span class="number">3</span>, <span class="number">6</span>):
+    ax = axes[idx<span class="number">-3</span>]
+    clusterer_final = KMeans(n_clusters=idx, n_jobs=<span class="number">4</span>)
+    clusterer_final = clusterer_final.fit(processed_numerical_random)
+    <span class="comment"># processed_p50_plot['KMeans_cluster'] = clusterer_final.labels_</span>
+    <span class="comment"># processed_p50_plot.sort_values('KMeans_cluster',axis=0,inplace=True)</span>
+
+    principalDf[str(idx)+<span class="string">'_clusters_label'</span>] = clusterer_final.labels_
+    <span class="comment"># principalDf.head()</span>
+    <span class="comment"># visualization</span>
+
+    ax.yaxis.set_tick_params(labelsize=<span class="number">14</span>)
+    ax.xaxis.set_tick_params(labelsize=<span class="number">14</span>)
+
+    <span class="comment"># principalDf.plot.scatter(x='principal component 1', y='principal component 2', label=principalDf.index, ax=ax);</span>
+    <span class="keyword">for</span> name, group <span class="keyword">in</span> principalDf.groupby(principalDf[str(idx)+<span class="string">'_clusters_label'</span>]):
+        group.plot.scatter(x=<span class="string">'principal component 1'</span>, y=<span class="string">'principal component 2'</span>, color=np.random.choice(colors_), s=<span class="number">60</span>, label=<span class="string">'Cluster '</span>+str(name+<span class="number">1</span>), ax=ax)
+
+    <span class="keyword">if</span> (idx<span class="number">-3</span> == <span class="number">1</span>):
+        ax.set_xlabel(<span class="string">'Principal Component 1 - {0}%'</span>.format(per_var[<span class="number">0</span>]), fontsize = <span class="number">15</span>)
+        ax.set_title(<span class="string">'PCA for Random Proteomics Data - By K-Means Clustering'</span>, fontsize = <span class="number">20</span>)
+    <span class="keyword">else</span>:
+        ax.set_xlabel(<span class="string">''</span>)
+
+    <span class="keyword">if</span> (idx<span class="number">-3</span> == <span class="number">0</span>):
+        ax.set_ylabel(<span class="string">'Principal Component 2 - {0}%'</span>.format(per_var[<span class="number">1</span>]), fontsize = <span class="number">15</span>)
+
+    ax.legend(fontsize=<span class="number">14</span>)
+    ax.grid()
+
+plt.tight_layout()
+plt.subplots_adjust(top=<span class="number">0.88</span>,wspace = <span class="number">0.03</span>,hspace=<span class="number">0.12</span>)
+
+
+<span class="comment"># ## RNA-Seq Dataset &amp; Analysis</span>
+
+<span class="comment"># In[40]:</span>
+
+
+BRCA_RNA_df = pd.read_csv(<span class="string">"BRCA_RNA_Seq_Samples_Overlap_with_Proteomes_RSEM_est.csv"</span>, index_col=<span class="number">0</span>)
+BRCA_RNA_df = BRCA_RNA_df * <span class="number">1e6</span>
+idx = BRCA_RNA_df.index
+BRCA_RNA_df.index = list(map(<span class="keyword">lambda</span> x: x.split(<span class="string">'|'</span>)[<span class="number">0</span>].strip(), idx))
+
+<span class="comment">## Filter out non-expressed genes</span>
+BRCA_RNA_df = BRCA_RNA_df.loc[BRCA_RNA_df.index != <span class="string">'?'</span>, :]
+
+BRCA_RNA_df = BRCA_RNA_df.loc[BRCA_RNA_df.sum(axis=<span class="number">1</span>) &gt; <span class="number">0</span>, :]
+
+<span class="comment">## Filter out lowly expressed genes</span>
+mask_low_vals = (BRCA_RNA_df &gt; <span class="number">0.3</span>).sum(axis=<span class="number">1</span>) &gt; <span class="number">2</span>
+BRCA_RNA_df = BRCA_RNA_df.loc[mask_low_vals, :]
+
+scaled_data = BRCA_RNA_df.T
+<span class="comment"># scaled_data = preprocessing.scale(scaled_data)</span>
+
+<span class="comment"># # 2D</span>
+pca = PCA(n_components=<span class="number">2</span>) <span class="comment"># create a PCA object</span>
+pca.fit(scaled_data) <span class="comment"># do the math</span>
+pca_data = pca.transform(scaled_data) <span class="comment"># get PCA coordinates for scaled_data</span>
+per_var = np.round(pca.explained_variance_ratio_* <span class="number">100</span>, decimals=<span class="number">1</span>) <span class="comment"># get the variance explained by each component</span>
+
+principalDf = pd.DataFrame(data = np.array(pca_data), index=BRCA_RNA_df.columns, columns = [<span class="string">'principal component 1'</span>, <span class="string">'principal component 2'</span>])
+principalDf = principalDf.merge(processed, left_index=<span class="literal">True</span>, right_index=<span class="literal">True</span>)
+principalDf = principalDf[[<span class="string">'principal component 1'</span>, <span class="string">'principal component 2'</span>, <span class="string">'PAM50 mRNA'</span>]].drop_duplicates()
+
+<span class="comment"># # visualization</span>
+fig = plt.figure(figsize = (<span class="number">10</span>,<span class="number">10</span>))
+ax = fig.add_subplot(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>) 
+
+<span class="comment"># principalDf.plot.scatter(x='principal component 1', y='principal component 2', label=principalDf.index, ax=ax);</span>
+<span class="keyword">for</span> name, group <span class="keyword">in</span> principalDf.groupby(principalDf[<span class="string">'PAM50 mRNA'</span>]):
+    group.plot.scatter(x=<span class="string">'principal component 1'</span>, y=<span class="string">'principal component 2'</span>, color=np.random.choice(colors_), s=<span class="number">60</span>, label=name, ax=ax)
+
+ax.set_xlabel(<span class="string">'Principal Component 1 - {0}%'</span>.format(per_var[<span class="number">0</span>]), fontsize = <span class="number">15</span>)
+ax.set_ylabel(<span class="string">'Principal Component 2 - {0}%'</span>.format(per_var[<span class="number">1</span>]), fontsize = <span class="number">15</span>)
+ax.set_title(<span class="string">'PCA for RNA Data - By PAM50'</span>, fontsize = <span class="number">20</span>)
+ax.yaxis.set_tick_params(labelsize=<span class="number">14</span>)
+ax.xaxis.set_tick_params(labelsize=<span class="number">14</span>)
+<span class="comment"># ax.set_yscale('log', basey=10)</span>
+<span class="comment"># ax.set_xscale('log', basex=10)</span>
+
+ax.legend(fontsize=<span class="number">15</span>)
+ax.grid()
+
+principalDf_ = principalDf[principalDf[<span class="string">'principal component 1'</span>] &lt; <span class="number">40000</span>]
+principalDf_ = principalDf_[principalDf_[<span class="string">'principal component 2'</span>] &lt; <span class="number">40000</span>]
+
+<span class="comment"># # visualization</span>
+fig = plt.figure(figsize = (<span class="number">10</span>,<span class="number">10</span>))
+ax = fig.add_subplot(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>) 
+
+<span class="comment"># principalDf.plot.scatter(x='principal component 1', y='principal component 2', label=principalDf.index, ax=ax);</span>
+<span class="keyword">for</span> name, group <span class="keyword">in</span> principalDf_.groupby(principalDf_[<span class="string">'PAM50 mRNA'</span>]):
+    group.plot.scatter(x=<span class="string">'principal component 1'</span>, y=<span class="string">'principal component 2'</span>, color=np.random.choice(colors_), s=<span class="number">60</span>, label=name, ax=ax)
+
+ax.set_xlabel(<span class="string">'Principal Component 1 - {0}%'</span>.format(per_var[<span class="number">0</span>]), fontsize = <span class="number">15</span>)
+ax.set_ylabel(<span class="string">'Principal Component 2 - {0}%'</span>.format(per_var[<span class="number">1</span>]), fontsize = <span class="number">15</span>)
+ax.set_title(<span class="string">'PCA for RNA Data (No Outliers) - By PAM50'</span>, fontsize = <span class="number">20</span>)
+ax.yaxis.set_tick_params(labelsize=<span class="number">14</span>)
+ax.xaxis.set_tick_params(labelsize=<span class="number">14</span>)
+<span class="comment"># ax.set_yscale('log', basey=10)</span>
+<span class="comment"># ax.set_xscale('log', basex=10)</span>
+
+ax.legend(fontsize=<span class="number">15</span>)
+ax.grid()
+
+<span class="comment"># scaled_data</span>
+
+
+<span class="comment"># In[41]:</span>
+
+
+BRCA_RNA_df.head(<span class="number">10</span>)
+
+
+<span class="comment"># In[46]:</span>
+
+
+rows_to_drop = principalDf.index[principalDf[<span class="string">'principal component 1'</span>] &gt; <span class="number">40000</span>].tolist() +                principalDf.index[principalDf[<span class="string">'principal component 2'</span>] &gt; <span class="number">40000</span>].tolist()
+
+BRCA_RNA_df_no_outliers = BRCA_RNA_df.drop(rows_to_drop, axis=<span class="number">1</span>, inplace=<span class="literal">False</span>)
+scaled_data_ = BRCA_RNA_df_no_outliers.T
+<span class="comment"># scaled_data = preprocessing.scale(scaled_data)</span>
+
+<span class="comment"># # 2D</span>
+pca = PCA(n_components=<span class="number">2</span>) <span class="comment"># create a PCA object</span>
+pca.fit(scaled_data_) <span class="comment"># do the math</span>
+pca_data_ = pca.transform(scaled_data_) <span class="comment"># get PCA coordinates for scaled_data</span>
+per_var_ = np.round(pca.explained_variance_ratio_* <span class="number">100</span>, decimals=<span class="number">1</span>) <span class="comment"># get the variance explained by each component</span>
+
+principalDf_ = pd.DataFrame(data = np.array(pca_data_), index=BRCA_RNA_df_no_outliers.columns, columns = [<span class="string">'principal component 1'</span>, <span class="string">'principal component 2'</span>])
+principalDf_ = principalDf_.merge(processed, left_index=<span class="literal">True</span>, right_index=<span class="literal">True</span>)
+principalDf_ = principalDf_[[<span class="string">'principal component 1'</span>, <span class="string">'principal component 2'</span>, <span class="string">'PAM50 mRNA'</span>]].drop_duplicates()
+
+
+<span class="comment"># # visualization</span>
+fig = plt.figure(figsize = (<span class="number">10</span>,<span class="number">10</span>))
+ax = fig.add_subplot(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>)
+
+<span class="comment"># principalDf.plot.scatter(x='principal component 1', y='principal component 2', label=principalDf.index, ax=ax);</span>
+<span class="keyword">for</span> name, group <span class="keyword">in</span> principalDf_.groupby(principalDf_[<span class="string">'PAM50 mRNA'</span>]):
+    group.plot.scatter(x=<span class="string">'principal component 1'</span>, y=<span class="string">'principal component 2'</span>, color=np.random.choice(colors_), s=<span class="number">60</span>, label=name, ax=ax)
+
+ax.set_xlabel(<span class="string">'Principal Component 1 - {0}%'</span>.format(per_var[<span class="number">0</span>]), fontsize = <span class="number">15</span>)
+ax.set_ylabel(<span class="string">'Principal Component 2 - {0}%'</span>.format(per_var[<span class="number">1</span>]), fontsize = <span class="number">15</span>)
+ax.set_title(<span class="string">'PCA for RNA Data (Refit without outliers) - By PAM50'</span>, fontsize = <span class="number">20</span>)
+ax.yaxis.set_tick_params(labelsize=<span class="number">14</span>)
+ax.xaxis.set_tick_params(labelsize=<span class="number">14</span>)
+<span class="comment"># ax.set_yscale('log', basey=10)</span>
+<span class="comment"># ax.set_xscale('log', basex=10)</span>
+
+ax.legend(fontsize=<span class="number">15</span>)
+ax.grid()
+
+
+<span class="comment"># ## RNA-Seq Differential Gene Expression Analysis</span>
+
+<span class="comment"># In[ ]:</span>
+
+
+<span class="keyword">import</span> warnings
+<span class="keyword">from</span> scipy.stats <span class="keyword">import</span> chi2
+<span class="keyword">from</span> scipy.stats.mstats <span class="keyword">import</span> zscore
+warnings.filterwarnings(<span class="string">"ignore"</span>, category=DeprecationWarning) 
+warnings.filterwarnings(<span class="string">"ignore"</span>, category=RuntimeWarning) 
+
+<span class="function"><span class="keyword">def</span> <span class="title">chdir</span><span class="params">(data, sampleclass, genes, gamma=<span class="number">1.</span>, sort=True, calculate_sig=False, nnull=<span class="number">10</span>, sig_only=False, norm_vector=True)</span>:</span>
+    <span class="string">"""</span>
+<span class="string">    Calculate the characteristic direction for a gene expression dataset</span>
+<span class="string"></span>
+<span class="string">    Input:</span>
+<span class="string">        data: numpy.array, is the data matrix of gene expression where rows correspond to genes and columns correspond to samples</span>
+<span class="string">        sampleclass: list or numpy.array, labels of the samples, it has to be consist of 0, 1 and 2, with 0 being columns to be excluded, 1 being control and 2 being perturbation</span>
+<span class="string">                example: sampleclass = [1,1,1,2,2,2]</span>
+<span class="string">        genes: list or numpy.array, row labels for genes </span>
+<span class="string">        gamma: float, regulaized term. A parameter that smooths the covariance matrix and reduces potential noise in the dataset</span>
+<span class="string">        sort: bool, whether to sort the output by the absolute value of chdir</span>
+<span class="string">        calculate_sig: bool, whether to calculate the significance of characteristic directions</span>
+<span class="string">        nnull: int, number of null characteristic directions to calculate for significance</span>
+<span class="string">        sig_only: bool, whether to return only significant genes; active only when calculate_sig is True</span>
+<span class="string">        norm_vector: bool, whether to return a characteristic direction vector normalized to unit vector</span>
+<span class="string">    Output:</span>
+<span class="string">        A list of tuples sorted by the absolute value in descending order characteristic directions of genes.</span>
+<span class="string">            If calculate_sig is set to True, each tuple contains a third element which is the ratio of characteristic directions to null ChDir</span>
+<span class="string">    """</span>
+
+    <span class="comment">## check input</span>
+    data.astype(float)
+    <span class="comment"># sampleclass = np.array(map(int, sampleclass))</span>
+    <span class="comment"># masks</span>
+    m_non0 = sampleclass != <span class="number">0</span>
+    m1 = sampleclass[m_non0] == <span class="number">1</span>
+    m2 = sampleclass[m_non0] == <span class="number">2</span>
+
+    <span class="comment"># if type(gamma) not in [float, int]:</span>
+    <span class="comment">#     raise ValueError("gamma has to be a numeric number")</span>
+    <span class="comment"># if set(sampleclass) != set([1,2]) and set(sampleclass) != set([0,1,2]):</span>
+    <span class="comment">#     raise ValueError("sampleclass has to be a list whose elements are in only 0, 1 or 2")</span>
+    <span class="comment"># if m1.sum()&lt;2 or m2.sum()&lt;2:</span>
+    <span class="comment">#     raise ValueError("Too few samples to calculate characteristic directions")</span>
+    <span class="comment"># if len(genes) != data.shape[0]:</span>
+    <span class="comment">#     raise ValueError("Number of genes does not match the demension of the expression matrix")</span>
+
+    <span class="comment">## normalize data</span>
+    data = data[:, m_non0]
+    data = zscore(data) <span class="comment"># standardize for each genes across samples</span>
+
+    <span class="comment">## start to compute</span>
+    n1 = m1.sum() <span class="comment"># number of controls</span>
+    n2 = m2.sum() <span class="comment"># number of experiments</span>
+
+    <span class="comment">## the difference between experiment mean vector and control mean vector.</span>
+    meanvec = data[:,m2].mean(axis=<span class="number">1</span>) - data[:,m1].mean(axis=<span class="number">1</span>) 
+
+    <span class="comment">## initialize the pca object</span>
+    pca = PCA(n_components=<span class="literal">None</span>)
+    pca.fit(data.T)
+
+    <span class="comment">## compute the number of PCs to keep</span>
+    cumsum = pca.explained_variance_ratio_ <span class="comment"># explained variance of each PC</span>
+    keepPC = len(cumsum[cumsum &gt; <span class="number">0.001</span>]) <span class="comment"># number of PCs to keep</span>
+
+    v = pca.components_[<span class="number">0</span>:keepPC].T <span class="comment"># rotated data </span>
+    r = pca.transform(data.T)[:,<span class="number">0</span>:keepPC] <span class="comment"># transformed data</span>
+
+    dd = ( np.dot(r[m1].T,r[m1]) + np.dot(r[m2].T,r[m2]) ) / float(n1+n2<span class="number">-2</span>) <span class="comment"># covariance</span>
+    sigma = np.mean(np.diag(dd)) <span class="comment"># the scalar covariance</span>
+
+    shrunkMats = np.linalg.inv(gamma*dd + sigma*(<span class="number">1</span>-gamma)*np.eye(keepPC))
+
+    b = np.dot(v, np.dot(np.dot(v.T, meanvec), shrunkMats))
+
+    <span class="keyword">if</span> norm_vector:
+        b /= np.linalg.norm(b) <span class="comment"># normalize b to unit vector</span>
+
+    grouped = zip([abs(item) <span class="keyword">for</span> item <span class="keyword">in</span> b],b,genes)
+    <span class="keyword">if</span> sort:
+        grouped = sorted(grouped,key=<span class="keyword">lambda</span> x: x[<span class="number">0</span>], reverse=<span class="literal">True</span>)
+
+
+    <span class="keyword">if</span> <span class="keyword">not</span> calculate_sig: <span class="comment"># return sorted b and genes.</span>
+        res = [(item[<span class="number">1</span>],item[<span class="number">2</span>]) <span class="keyword">for</span> item <span class="keyword">in</span> grouped]
+        <span class="keyword">return</span> res
+    <span class="keyword">else</span>: <span class="comment"># generate a null distribution of chdirs</span>
+        nu = n1 + n2 - <span class="number">2</span>
+        y1 = np.random.multivariate_normal(np.zeros(keepPC), dd, nnull).T * np.sqrt(nu / chi2.rvs(nu,size=nnull))
+        y2 = np.random.multivariate_normal(np.zeros(keepPC), dd, nnull).T * np.sqrt(nu / chi2.rvs(nu,size=nnull))
+        y = y2 - y1 <span class="comment">## y is the null of v</span>
+
+        nullchdirs = []
+        <span class="keyword">for</span> col <span class="keyword">in</span> y.T:
+            bn = np.dot(np.dot(np.dot(v,shrunkMats), v.T), np.dot(col,v.T))
+            bn /= np.linalg.norm(bn)
+            bn = bn ** <span class="number">2</span>
+            bn.sort()
+            bn = bn[::<span class="number">-1</span>] <span class="comment">## sort in decending order</span>
+            nullchdirs.append(bn)
+
+        nullchdirs = np.array(nullchdirs).T
+        nullchdirs = nullchdirs.mean(axis=<span class="number">1</span>)
+        b_s = b ** <span class="number">2</span> 
+        b_s.sort()
+        b_s = b_s[::<span class="number">-1</span>] <span class="comment"># sorted b in decending order</span>
+        relerr = b_s / nullchdirs <span class="comment">## relative error</span>
+        <span class="comment"># ratio_to_null</span>
+        ratios = np.cumsum(relerr)/np.sum(relerr)- np.linspace(<span class="number">1.</span>/len(meanvec),<span class="number">1</span>,len(meanvec))
+        res = [(item[<span class="number">1</span>],item[<span class="number">2</span>], ratio) <span class="keyword">for</span> item, ratio <span class="keyword">in</span> zip(grouped, ratios)] 
+        <span class="keyword">print</span> (<span class="string">'Number of significant genes: %s'</span>%(np.argmax(ratios)+<span class="number">1</span>))
+        <span class="keyword">if</span> sig_only:
+            <span class="keyword">return</span> res[<span class="number">0</span>:np.argmax(ratios)+<span class="number">1</span>]
+        <span class="keyword">else</span>:
+            <span class="keyword">return</span> res
+
+
+<span class="function"><span class="keyword">def</span> <span class="title">paea</span><span class="params">(chdir, gmtline, case_sensitive=False)</span>:</span>
+    <span class="string">"""</span>
+<span class="string">    Perform principal angle enrichment analysis (PAEA)</span>
+<span class="string">    Input:</span>
+<span class="string">        chdir, list of tuples: A characteristic direction returned from chdir function</span>
+<span class="string">        gmtline: A list of genes from a gene set </span>
+<span class="string">    Output:</span>
+<span class="string">        a list of tuples in the format of:</span>
+<span class="string">            the principal angle, the p value</span>
+<span class="string">    """</span>
+    <span class="keyword">if</span> len(chdir[<span class="number">0</span>]) == <span class="number">3</span>: <span class="comment">## output from which calculate_sig is enabled</span>
+        chdir = [(item[<span class="number">0</span>],item[<span class="number">1</span>]) <span class="keyword">for</span> item <span class="keyword">in</span> chdir]
+    <span class="keyword">if</span> <span class="keyword">not</span> case_sensitive:
+        genes_measured = [gene.upper() <span class="keyword">for</span> b, gene <span class="keyword">in</span> chdir]
+        gmtline = [gene.upper() <span class="keyword">for</span> gene <span class="keyword">in</span> gmtline]
+    <span class="keyword">else</span>: <span class="comment"># case sensitive</span>
+        genes_measured = [gene <span class="keyword">for</span> b, gene <span class="keyword">in</span> chdir]
+
+    <span class="keyword">if</span> len(set(genes_measured)) != len(chdir):
+        <span class="keyword">raise</span> ValueError(<span class="string">'There are duplicated genes in the input genes'</span>)
+
+    mask = np.in1d(genes_measured, gmtline) <span class="comment"># gpos in the R script</span>
+    mm = np.where(mask==<span class="literal">True</span>)[<span class="number">0</span>]
+    m = mask.sum() <span class="comment"># number of overlaping genes</span>
+    n = len(genes_measured)
+
+    <span class="keyword">if</span> m &gt; <span class="number">1</span> <span class="keyword">and</span> m &lt; n: <span class="comment"># if there is overlap between gene set and genes in chdir</span>
+        gsa = np.zeros((n, m)) <span class="comment"># Qc in the paper</span>
+        <span class="keyword">for</span> i <span class="keyword">in</span> range(m):
+            gsa[mm[i], i] = <span class="number">1.</span>
+
+        qb = np.array([b <span class="keyword">for</span> b,gene <span class="keyword">in</span> chdir])
+        qbqc = np.matrix( np.dot(qb, gsa) ) <span class="comment"># Qb.T Qc in paper</span>
+        principal_angle = np.linalg.svd(qbqc,compute_uv=<span class="literal">False</span>)[<span class="number">0</span>]
+        theta = np.arccos(principal_angle)
+
+        <span class="comment"># calculation of the null-distribution of principal angles</span>
+        m = float(m)
+        n = float(n)
+        pac = <span class="keyword">lambda</span> theta: <span class="number">2.</span>*(<span class="number">1.</span>/np.sqrt(<span class="number">2</span>*np.pi))*np.exp((n/<span class="number">2.</span>)*np.log(n/(n - m))+(m/<span class="number">2.</span>)*np.log((n - m)/m)+(<span class="number">1</span>/<span class="number">2.</span>)*np.log(m/(<span class="number">2.</span>*n)*(n - m))+(n-m<span class="number">-1</span>)*np.log(np.sin(theta))+(m<span class="number">-1</span>)*np.log(np.cos(theta)))
+        integration_range = np.linspace(<span class="number">0</span>, theta, num=<span class="number">10000</span>, endpoint=<span class="literal">True</span>) <span class="comment">## num seems to matter a lot</span>
+        p_val = np.trapz(pac(integration_range), integration_range)
+        <span class="keyword">if</span> p_val &gt; <span class="number">1.</span>:
+            p_val = <span class="number">1.</span>
+    <span class="keyword">else</span>:
+        principal_angle = <span class="number">0.</span>
+        p_val = <span class="number">1.</span>
+
+    <span class="keyword">return</span> principal_angle, p_val
+
+
+<span class="function"><span class="keyword">def</span> <span class="title">paea_wrapper</span><span class="params">(chdir, gmt_fn, case_sensitive=False, sort=True)</span>:</span>
+    <span class="string">"""</span>
+<span class="string">    A wrapper function for PAEA gene-set enrichment analysis</span>
+<span class="string"></span>
+<span class="string">    Input:</span>
+<span class="string">        chdir: characteristic directions computed by chdir function</span>
+<span class="string">        gmt_fn: file name of a gene-set library in GMT format</span>
+<span class="string">        case_sensitive: whether gene symbols should be considered as case_sensitive</span>
+<span class="string">    Output:</span>
+<span class="string">        a sorted list of tuples (term, p_val)</span>
+<span class="string">    """</span>
+    <span class="comment">## check input:</span>
+    <span class="keyword">if</span> <span class="keyword">not</span> gmt_fn.endswith(<span class="string">'.gmt'</span>):
+        <span class="keyword">raise</span> IOError(<span class="string">"The gene-set library file is not in GMT format"</span>)
+
+    <span class="comment">## read gmt into a dict:</span>
+    res = []
+    <span class="keyword">with</span> open (gmt_fn) <span class="keyword">as</span> f:
+        <span class="keyword">for</span> line <span class="keyword">in</span> f:
+            sl = line.strip().split(<span class="string">'\t'</span>)
+            term = sl[<span class="number">0</span>]
+            genes = sl[<span class="number">2</span>:]
+            <span class="keyword">if</span> <span class="string">','</span> <span class="keyword">in</span> genes[<span class="number">0</span>]: <span class="comment">## auto detect fuzzy gmts</span>
+                genes = [gene.split(<span class="string">','</span>)[<span class="number">0</span>] <span class="keyword">for</span> gene <span class="keyword">in</span> genes]
+            principal_angle, p_val = paea(chdir, genes, case_sensitive=case_sensitive)
+            res.append( (term, p_val) )
+    <span class="keyword">if</span> sort:<span class="comment">## sort terms based on p values in ascending order</span>
+        res = sorted(res, key=<span class="keyword">lambda</span> x:x[<span class="number">1</span>])
+    <span class="keyword">else</span>: <span class="comment">## if not sort, return unsorted p_vals only</span>
+        res = [p_val <span class="keyword">for</span> term, p_val <span class="keyword">in</span> res ]
+    <span class="keyword">return</span> res
+
+
+<span class="comment"># In[ ]:</span>
+
+
+<span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict
+<span class="comment"># Get the PAM50 for each sample in a dictionary</span>
+sample_PAM50 = OrderedDict(principalDf_[<span class="string">'PAM50 mRNA'</span>].to_dict())
+<span class="comment"># PAM50_sample = {}</span>
+<span class="comment"># for key, value in sample_PAM50.items():</span>
+<span class="comment">#     if (value in PAM50_sample):</span>
+<span class="comment">#         PAM50_sample[value].append(key)</span>
+<span class="comment">#     else:</span>
+<span class="comment">#         PAM50_sample[value] = [key]</span>
+
+cd_results = pd.DataFrame(index=BRCA_RNA_df_no_outliers.index)
+cd_genes = {}
+
+<span class="comment"># Conduct the DGE Analysis</span>
+<span class="comment"># Based on different PAM50 Groups</span>
+<span class="comment"># 1. Luminal A vs B</span>
+comparison = <span class="string">'Luminal_A_vs_B'</span>
+mapping_dict = {<span class="string">'Basal-like'</span>: <span class="number">0</span>, <span class="string">'HER2-enriched'</span>: <span class="number">0</span>, <span class="string">'Luminal A'</span>: <span class="number">1</span>, <span class="string">'Luminal B'</span>:<span class="number">2</span>}
+sampleclass = np.array([mapping_dict[P] <span class="keyword">for</span> P <span class="keyword">in</span> principalDf_[<span class="string">'PAM50 mRNA'</span>].tolist()])
+
+cd_res = chdir(BRCA_RNA_df_no_outliers.values, sampleclass, BRCA_RNA_df_no_outliers.index)
+cd_coefs = np.array(list(map(<span class="keyword">lambda</span> x: x[<span class="number">0</span>], cd_res)))
+cd_results[comparison] = cd_coefs
+
+<span class="comment"># sort CD in by absolute values in descending order</span>
+up_genes = cd_results[comparison].abs().sort_values().index[:<span class="number">500</span>]
+dn_genes = cd_results[comparison].abs().sort_values().index[<span class="number">-500</span>:]
+
+<span class="comment"># split up and down</span>
+cd_genes[comparison+<span class="string">'-up'</span>] = up_genes
+cd_genes[comparison+<span class="string">'-dn'</span>] = dn_genes
+
+
+<span class="comment"># In[55]:</span>
+
+
+cd_genes
+
+
+<span class="comment"># ### Use DAVID: Functional Annotation Tools to figure out the biological pathways correlated with our up-regulated genes: https://david.ncifcrf.gov/tools.jsp</span>
+<span class="comment"># </span>
+<span class="comment"># Try to generate a table (panda dataframe) for our analysis results.</span></code></pre>
+</article><!-- lincense--><div class="license-wrapper"><p> <span>Author:  </span><a href="https://jannyzhou2.github.io">Janny Zhou</a></p><p> <span>Link:  </span><a href="https://jannyzhou2.github.io/2019/08/20/Coding-Demonstration/">https://jannyzhou2.github.io/2019/08/20/Coding-Demonstration/</a></p><p> <span>Copyright:  </span><span>All articles in this blog are licensed under <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0">CC BY-NC-SA 3.0</a> unless stating additionally.</span></p></div><div class="post-paginator"><a class="prevSlogan" href="/2019/08/20/Project-Summary/" title="Project Summary"><span>< PreviousPost</span><br><span class="prevTitle">Project Summary</span></a><div class="clear"></div></div><div id="comment"></div></section></article><footer id="cxo-footer-outer"><div id="cxo-footer-inner"><p class="footer-container"><span>Site by </span><a href="http://hexo.io"><span>Hexo</span></a><span> | theme </span><a href="https://github.com/Longlongyu/hexo-theme-Cxo"><span>Cxo</span></a></p><i class="fa fa-user"> </i><span id="busuanzi_value_site_uv"></span><span> | </span><i class="fa fa-eye"> </i><span id="busuanzi_value_site_pv"></span></div></footer><!-- catelog--><div class="toc-wrapper" style="top: 70vh;"><div class="toc-catalog"><i class="fa fa-list"> </i><span>CATALOG</span></div></div><!-- top--><i class="fa fa-arrow-up close" id="go-up" aria-hidden="true"></i></body></html>
